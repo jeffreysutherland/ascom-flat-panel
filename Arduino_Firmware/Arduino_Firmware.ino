@@ -40,8 +40,8 @@ void setup() {
     // Even though the board is inside an enclosure, the light can be seen shining
     // through the small opening for the USB connector! Unfortunately, it is not
     // possible to turn off the power LED (green) in code...
-    pinMode(PIN_LED_TXL, INPUT);
-    pinMode(PIN_LED_RXL, INPUT);
+    //pinMode(PIN_LED_TXL, INPUT);
+    //pinMode(PIN_LED_RXL, INPUT);
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
 
@@ -93,7 +93,7 @@ void setBrightness() {
     // to a much higher value (I use 20kHz) This does not work on all pins!
     // For example, it does not work on pin 7 of the Xiao, but it works on pin 8.
     int value = map(brightness, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 0, 1023);
-    pwm(ledPin, PWM_FREQ, value);
+    //pwm(ledPin, PWM_FREQ, value);
 }
 
 void calibratorOn(byte _brightness) {
