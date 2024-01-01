@@ -165,17 +165,24 @@ private:
     unsigned long _lastBounceTime;
 };
 
+class MotorControl
+{
+public:
+
+
+private:
+    uint8_t _openPin;
+    uint8_t _closePin;
+    uint8_t _speed;
+    MotionState _state;
+};
+
 Relay powerRelay(POWER_PIN);
 LimitSwitch openedLimitSwitch(MOTOR_OPENED_LIMIT_PIN, SWITCH_DEBOUNCE_TIME);
 LimitSwitch closedLimitSwitch(MOTOR_CLOSED_LIMIT_PIN, SWITCH_DEBOUNCE_TIME);
 
-MotionState motionState = Stopped;
-
 unsigned long motionWaitTime;
 unsigned long powerWaitTime;
-
-void TestCyclePower();
-void TestCycleMotor();
 
 void setup()
 {
@@ -201,7 +208,7 @@ void setup()
     powerRelay.TurnOn();
     Serial.println("Power relay on...");
 
-    // set up motor pins
+    // set up motor
     Serial.println("Setting up motor pins...");
     pinMode(MOTOR_OPEN_PIN, OUTPUT);
     pinMode(MOTOR_CLOSE_PIN, OUTPUT);
@@ -214,6 +221,7 @@ void setup()
     powerWaitTime = millis() + 1000;
 }
 
+bool motorOn = false;
 
 void loop()
 {
@@ -221,121 +229,20 @@ void loop()
     openedLimitSwitch.Update();
     closedLimitSwitch.Update();
 
-    powerRelay.Set(openedLimitSwitch.IsPressed());
+    bool buttonOn = openedLimitSwitch.IsPressed();
+    //powerRelay.Set(openedLimitSwitch.IsPressed());
 
-    //TestCyclePower();
-    //TestCycleMotor();
-}
-/*
-void TestCyclePower()
-{
-    PowerState targPowerState = powerState;
-
-    if (millis() > powerWaitTime)
+// test button!!
+    if (buttonOn && !motorOn)
     {
-        if (powerState == On)
-        {
-            targPowerState = Off;
-        }
-        else if (powerState == Off)
-        {
-            targPowerState = On;
-        }
-
-        powerWaitTime = millis() + 500;
+        Serial.println("Button on");
+        motorOn = true;
+        digitalWrite(MOTOR_OPEN_PIN, HIGH);
     }
-
-    // update the power state
-    if (targPowerState != powerState)
+    else if (!buttonOn && motorOn)
     {
-        if (targPowerState == On)
-        {
-            // turn on
-            Serial.println("Turning on power relay...");
-            digitalWrite(POWER_PIN, HIGH);
-        }
-        else if (targPowerState == Off)
-        {
-            // turn off
-            Serial.println("Turning off power relay...");
-            digitalWrite(POWER_PIN, LOW);
-        }
-        
-        powerState = targPowerState;
+        Serial.println("Button off");
+        motorOn = false;
+        digitalWrite(MOTOR_OPEN_PIN, LOW);
     }
 }
-
-void TestCycleMotor()
-{
-        MotionState targState = motionState;
-
-    // temp test direction changing code
-    if (millis() > motionWaitTime)
-    {
-        if (motionState == Stopped)
-        {
-            if (openedLimitSwitch.isPressed())
-            {
-                targState = Closing;
-            }
-            else if (closedLimitSwitch.isPressed())
-            {
-                targState = Opening;
-            }
-            else
-            {
-                targState = Opening;
-            }
-        }
-        else if (motionState == Opening)
-        {
-            targState = Closing;
-        }
-        else if (motionState == Closing)
-        {
-            targState = Stopped;
-        }
-
-        motionWaitTime = millis() + 1000;
-    }
-
-    // check the limit switches
-    if (openedLimitSwitch.isPressed())
-    {
-        Serial.println("Open limit switch reached");
-        targState = Stopped;
-    }
-    else if (closedLimitSwitch.isPressed())
-    {
-        Serial.println("Closed limit switch reached");
-        targState = Stopped;
-    }
-
-    // update the motor state
-    if (targState != motionState)
-    {
-        if (targState == Opening)
-        {
-            // start opening
-            Serial.println("Opening...");
-            digitalWrite(MOTOR_OPEN_PIN, HIGH);
-            digitalWrite(MOTOR_CLOSE_PIN, LOW);
-        }
-        else if (targState == Closing)
-        {
-            // start closing
-            Serial.println("Closing...");
-            digitalWrite(MOTOR_OPEN_PIN, LOW);
-            digitalWrite(MOTOR_CLOSE_PIN, HIGH);
-        }
-        else if (targState == Stopped)
-        {
-            // stop
-            Serial.println("Stopping...");
-            digitalWrite(MOTOR_OPEN_PIN, LOW);
-            digitalWrite(MOTOR_CLOSE_PIN, LOW);
-        }
-        
-        motionState = targState;
-    }
-}*/
