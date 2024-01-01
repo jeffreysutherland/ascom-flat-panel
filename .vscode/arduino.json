@@ -1,5 +1,6 @@
 {
-    "configuration": "cpu=atmega328",
+    "configuration": "cpu=atmega328old",
     "board": "arduino:avr:nano",
-    "sketch": "Arduino_Firmware\\Arduino_Firmware.ino"
+    "port": "COM9",
+    "sketch": "Arduino_Firmware\\motor_limits\\motor_limits.ino"
 }
